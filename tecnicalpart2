@@ -1,0 +1,33 @@
+import pandas as pd
+
+df = pd.read_csv('https://raw.githubusercontent.com/wizelineacademy/data-engineering-bootcamp/main/data/sample.csv')
+
+#How many commercial chains are monitored, and therefore, included in this database?
+
+cadena_comercial_col = df.cadenaComercial
+cadena_comercial_col.nunique()
+cadena_comercial_col.unique()
+
+#What are the top 10 monitored products by State?
+
+df['ones'] = 1
+df_grouped_sp = df.groupby(['estado', 'producto'])
+
+count_df = df_grouped_sp.ones.count()
+
+df_grouped_lv0 = count_df.groupby(level=0)
+
+def lrgst(df):
+    """
+    Devuelve el top 10
+    """
+    if len(df) >= 10:
+        return df.nlargest(10)#, 'Time')
+
+top_5_per_state = pd.concat([lrgst(d) for _, d in df_grouped_lv0])
+
+# Which is the commercial chain with the highest number of monitored products?
+df_group_cadena = df.loc[:,['producto', 'cadenaComercial']].groupby('cadenaComercial')
+cadena_producto_nunique = df_group_cadena.nunique()
+cadena_producto_nunique
+cadena_producto_nunique.sort_values('producto',ascending=False)
